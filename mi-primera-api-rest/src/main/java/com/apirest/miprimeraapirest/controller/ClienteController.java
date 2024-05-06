@@ -22,17 +22,18 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente create(@RequestBody Cliente cliente){
             return clienteService.save(cliente);
-
     }
+
     @PutMapping("cliente")
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente update( @RequestBody Cliente cliente){
-        return clienteService.save(cliente);
+            return clienteService.save(cliente);
     }
 
     @DeleteMapping("cliente/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> delete(@PathVariable Integer id){
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id){
+        // @PathVariable("id") para utilizar el path Variable se tiene que nombrar a la variable;
         // también se puede utilziar el @RequestParam
         Map<String, Object> response = new HashMap<>();
         try{
@@ -47,8 +48,8 @@ public class ClienteController {
     }
 
     @GetMapping("cliente/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Cliente showById(@PathVariable Integer id){
+    public Cliente showById(@PathVariable("id") Integer id){
         return clienteService.findById(id);
     }
+
 }
