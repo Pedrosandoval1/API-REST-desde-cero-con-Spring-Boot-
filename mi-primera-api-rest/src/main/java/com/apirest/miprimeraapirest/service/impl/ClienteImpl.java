@@ -32,6 +32,12 @@ public class ClienteImpl implements ICliente {
         clienteDao.delete(cliente);
     }
 
+    @Transactional()
+    @Override
+    public Iterable<Cliente> findAll() {
+        return clienteDao.findAll();
+    }
+
 }
 //Acá ya es la logica implementando el CLienteDao para poder utilizar
 

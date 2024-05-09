@@ -17,17 +17,30 @@ public class ClienteController {
 
     @Autowired
     private ICliente clienteService;
-
+    Map<String, Object> response = new HashMap<>();
     @PostMapping("cliente")
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente create(@RequestBody Cliente cliente){
-            return clienteService.save(cliente);
+    public ResponseEntity<?> create(@RequestBody Cliente cliente){
+        try{
+            Cliente clienteCreate = clienteService.save(cliente);
+            return new ResponseEntity<>(clienteCreate, HttpStatus.CREATED);
+        }catch(DataAccessException exDt){
+            response.put("mensaje", exDt.getMessage());
+            response.put("cliente", null);
+            return new ResponseEntity<>( response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("cliente")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Cliente update( @RequestBody Cliente cliente){
-            return clienteService.save(cliente);
+    public ResponseEntity<?> update( @RequestBody Cliente cliente){
+        try{
+            Cliente clienteCreated = clienteService.save(cliente);
+            return new ResponseEntity<>(clienteCreated, HttpStatus.CREATED);
+        }catch (DataAccessException exDt){
+            response.put("mensaje", exDt.getMessage());
+            response.put("cliente", null);
+            return new ResponseEntity<>( response, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("cliente/{id}")
@@ -35,7 +48,6 @@ public class ClienteController {
     public ResponseEntity<?> delete(@PathVariable("id") Integer id){
         // @PathVariable("id") para utilizar el path Variable se tiene que nombrar a la variable;
         // también se puede utilziar el @RequestParam
-        Map<String, Object> response = new HashMap<>();
         try{
             Cliente clienteDelete = clienteService.findById(id);
             clienteService.delete(clienteDelete);
@@ -52,4 +64,16 @@ public class ClienteController {
         return clienteService.findById(id);
     }
 
+    @GetMapping("cliente")
+    public Iterable<Cliente> findAll(){
+        try{
+            Iterable<Cliente> clienteFindAll =  clienteService.findAll();
+            return new ResponseEntity<>(clienteFindAll, HttpStatus.OK).getBody();
+        }catch(DataAccessException exDt){
+            response.put("mensaje", exDt.getMessage());
+            response.put("cliente", null);
+            return (Iterable<Cliente>) new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR).getBody();
+        }
+
+    }
 }
