@@ -23,11 +23,10 @@ public class ClienteController {
     public ResponseEntity<?> create(@RequestBody Cliente cliente){
         try{
             Cliente clienteCreate = clienteService.save(cliente);
-            return new ResponseEntity<>(clienteCreate, HttpStatus.CREATED);
+            return ResponseEntity.ok(clienteCreate);
         }catch(DataAccessException exDt){
-            response.put("mensaje", exDt.getMessage());
-            response.put("cliente", null);
-            return new ResponseEntity<>( response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error al Crear el cliente: "+ exDt.getMessage());
         }
     }
 
@@ -35,45 +34,39 @@ public class ClienteController {
     public ResponseEntity<?> update( @RequestBody Cliente cliente){
         try{
             Cliente clienteCreated = clienteService.save(cliente);
-            return new ResponseEntity<>(clienteCreated, HttpStatus.CREATED);
+            return  ResponseEntity.ok(clienteCreated);
         }catch (DataAccessException exDt){
-            response.put("mensaje", exDt.getMessage());
-            response.put("cliente", null);
-            return new ResponseEntity<>( response, HttpStatus.BAD_REQUEST);
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error al Actualizar el cliente: "+ exDt.getMessage());
         }
     }
 
-    @DeleteMapping("cliente/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<?> delete(@PathVariable("id") Integer id){
-        // @PathVariable("id") para utilizar el path Variable se tiene que nombrar a la variable;
-        // también se puede utilziar el @RequestParam
-        try{
-            Cliente clienteDelete = clienteService.findById(id);
-            clienteService.delete(clienteDelete);
-            return new ResponseEntity<>(clienteDelete, HttpStatus.NO_CONTENT);
-        }catch(DataAccessException exDt){
-            response.put("mensaje", exDt.getMessage());
-            response.put("cliente", null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    @DeleteMapping("/cliente/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
+        try {
+            Cliente cliente = clienteService.findById(id);
+            clienteService.delete(cliente);
+            return ResponseEntity.noContent().build();
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar el cliente: " + ex.getMessage());
         }
     }
+
 
     @GetMapping("cliente/{id}")
     public Cliente showById(@PathVariable("id") Integer id){
         return clienteService.findById(id);
     }
 
-    @GetMapping("cliente")
-    public Iterable<Cliente> findAll(){
-        try{
-            Iterable<Cliente> clienteFindAll =  clienteService.findAll();
-            return new ResponseEntity<>(clienteFindAll, HttpStatus.OK).getBody();
-        }catch(DataAccessException exDt){
-            response.put("mensaje", exDt.getMessage());
-            response.put("cliente", null);
-            return (Iterable<Cliente>) new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR).getBody();
+        @GetMapping("clientes")
+        public ResponseEntity<?> findAll() {
+            try {
+                Iterable<Cliente> clientes = clienteService.findAll();
+                return ResponseEntity.ok(clientes);
+            } catch (DataAccessException ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Error al recuperar los clientes: " + ex.getMessage());
+            }
         }
-
     }
-}
