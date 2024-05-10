@@ -1,11 +1,12 @@
 package com.apirest.miprimeraapirest.service;
 
+import com.apirest.miprimeraapirest.model.dto.ClienteDto;
 import com.apirest.miprimeraapirest.model.entity.Cliente;
 
 public interface ICliente {
-    Cliente save(Cliente cliente);
+    Cliente save(ClienteDto clienteDto);
     Cliente findById(Integer id);
-    void delete (Cliente cliente);
+    void delete (Cliente clienteDto);
 
     Iterable<Cliente> findAll ();
 

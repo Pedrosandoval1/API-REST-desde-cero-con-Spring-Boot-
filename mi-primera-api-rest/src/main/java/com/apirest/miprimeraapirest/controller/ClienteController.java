@@ -1,5 +1,6 @@
 package com.apirest.miprimeraapirest.controller;
 
+import com.apirest.miprimeraapirest.model.dto.ClienteDto;
 import com.apirest.miprimeraapirest.model.entity.Cliente;
 import com.apirest.miprimeraapirest.service.ICliente;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -17,13 +16,19 @@ public class ClienteController {
 
     @Autowired
     private ICliente clienteService;
-    Map<String, Object> response = new HashMap<>();
     @PostMapping("cliente")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> create(@RequestBody Cliente cliente){
+    public ResponseEntity<?> create(@RequestBody ClienteDto clienteDto){
         try{
-            Cliente clienteCreate = clienteService.save(cliente);
-            return ResponseEntity.ok(clienteCreate);
+            Cliente clienteCreate = clienteService.save(clienteDto);
+            Cliente getClienteData = Cliente.builder()
+                    .idCliente(clienteCreate.getIdCliente())
+                    .nombre(clienteCreate.getNombre())
+                    .apellido(clienteCreate.getApellido())
+                    .correo(clienteCreate.getCorreo())
+                    .fechaRegistro(clienteCreate.getFechaRegistro())
+                    .build();
+            return ResponseEntity.ok(getClienteData);
         }catch(DataAccessException exDt){
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error al Crear el cliente: "+ exDt.getMessage());
@@ -31,10 +36,17 @@ public class ClienteController {
     }
 
     @PutMapping("cliente")
-    public ResponseEntity<?> update( @RequestBody Cliente cliente){
+    public ResponseEntity<?> update( @RequestBody ClienteDto cliente){
         try{
-            Cliente clienteCreated = clienteService.save(cliente);
-            return  ResponseEntity.ok(clienteCreated);
+            Cliente clienteUpdate = clienteService.save(cliente);
+            Cliente getClienteData = Cliente.builder()
+                    .idCliente(clienteUpdate.getIdCliente())
+                    .nombre(clienteUpdate.getNombre())
+                    .apellido(clienteUpdate.getApellido())
+                    .correo(clienteUpdate.getCorreo())
+                    .fechaRegistro(clienteUpdate.getFechaRegistro()).build();
+
+            return  ResponseEntity.ok(getClienteData);
         }catch (DataAccessException exDt){
             return  ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error al Actualizar el cliente: "+ exDt.getMessage());
@@ -55,8 +67,22 @@ public class ClienteController {
 
 
     @GetMapping("cliente/{id}")
-    public Cliente showById(@PathVariable("id") Integer id){
-        return clienteService.findById(id);
+    public ResponseEntity<?> showById(@PathVariable("id") Integer id){
+        try {
+
+            Cliente clienteShowById = clienteService.findById(id);
+            Cliente getClienteData = Cliente.builder()
+                    .idCliente(clienteShowById.getIdCliente())
+                    .nombre(clienteShowById.getNombre())
+                    .apellido(clienteShowById.getApellido())
+                    .correo(clienteShowById.getCorreo())
+                    .fechaRegistro(clienteShowById.getFechaRegistro()).build();
+            return ResponseEntity.ok(getClienteData);
+        }catch(DataAccessException ex){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body("Error al recuperar al cliente: + " + ex.getMessage());
+        }
+
     }
 
         @GetMapping("clientes")
@@ -65,7 +91,7 @@ public class ClienteController {
                 Iterable<Cliente> clientes = clienteService.findAll();
                 return ResponseEntity.ok(clientes);
             } catch (DataAccessException ex) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .body("Error al recuperar los clientes: " + ex.getMessage());
             }
         }

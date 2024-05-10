@@ -1,6 +1,7 @@
 package com.apirest.miprimeraapirest.service.impl;
 
 import com.apirest.miprimeraapirest.model.dao.ClienteDao;
+import com.apirest.miprimeraapirest.model.dto.ClienteDto;
 import com.apirest.miprimeraapirest.model.entity.Cliente;
 import com.apirest.miprimeraapirest.service.ICliente;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,13 @@ public class ClienteImpl implements ICliente {
     //solo es para una consulta, osea que no se va a hacer modificaciones
     @Transactional()
     @Override
-    public Cliente save(Cliente cliente) {
+    public Cliente save(ClienteDto clienteDto) {
+        Cliente cliente = Cliente.builder()
+                .idCliente(clienteDto.getIdCliente())
+                .nombre(clienteDto.getNombre())
+                .apellido(clienteDto.getApellido())
+                .correo(clienteDto.getCorreo())
+                .fechaRegistro(clienteDto.getFechaRegistro()).build();
         return clienteDao.save(cliente);
     }
 
